@@ -1,0 +1,111 @@
+<br/>
+<br/> 
+<p-panel [style]="{'width':'95%', 'margin':'auto'}">
+    <p-header>
+        <div style="margin:auto; text-align:left;">
+            <div class="ui-grid-col-8">
+                    <span>{{ componentTitle }}</span>
+            </div>
+        </div>
+    </p-header>
+
+    <div id="msg" style="text-align:left;">
+          <p-messages [(value)]="msgs"  autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+     <div id="msg" style="text-align:left;">
+         <p-growl [(value)]="successMsgs"></p-growl>
+      </div>
+
+    <br/>
+    <p-fieldset legend="File Upload" align="left" >
+        <div class="ui-grid ui-grid-responsive ui-grid-pad">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6" style="float:left">
+                    <p-dropdown [options]="fileTypes" [(ngModel)]="filetypeVal" (onChange)="clearUpload();"></p-dropdown>
+                    <input #selectedFile type="file"  (change)="fileChangeEvent($event)" placeholder="Upload file"/>
+                </div>
+            </div>
+        </div>
+    </p-fieldset>
+            
+    <p-footer>
+        <hr style="border: 0; height: 2px; background:#2191c0;"/>
+        <div style="text-align:right;">
+                <p-calendar [(ngModel)]="fileSheduleDate" showTime="showTime" [minDate]="minDate" hourFormat="24" placeholder="You can schedule your Job Date/Time" readonlyInput="true"></p-calendar>
+                <button icon="fa fa-upload" iconPos="right" [disabled]="!isFileExist" pButton type="text" label="Upload"  (click)="upload();selectedFile.value = '';"></button>
+        </div>
+        </p-footer>
+</p-panel>
+
+<br/>
+
+<p-dataTable [style]="{'width':'95%', 'height':'85%', 'margin':'auto'}"  tableStyleClass="prime-table-one" [value]="reportDataDetails"  [rows]="10" [paginator]="true" [rowStyleClass]="customizeRowStyle" selectionMode="single" [(selection)]="selectedRow">
+     <hr style="border: 0; height: 2px; background:#2191c0;"/>
+    <p-header>
+         <div class="ui-grid ui-grid-responsive ui-grid-pad">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6">
+                    <span style="float:left">Report Request History</span>
+                </div>
+                <div class="ui-grid-col-6">
+                    <span style="float:right">
+                        <button pButton type="text" label="Refresh" icon="fa fa-refresh" iconPos="right"
+                             (click)="refreshJobScheduleHistory()"></button>
+                     </span>
+                </div>
+             </div>
+        </div>
+    </p-header>
+    <p-column header='Report Id' [style]="{'text-align':'center','width': '8%'}">
+        <template let-col let-item="rowData" pTemplate="body">
+            <span *ngIf="item['costSellProcessId']">REQ{{("000000"+item['costSellProcessId']).slice(-6)}}</span>
+        </template>
+    </p-column>
+    <p-column header='File' [style]="{'text-align':'center','width': '35%'}">
+         <template let-col let-item="rowData" pTemplate="body">
+            <span (click)="inputClick(item)" title="Click on the File Name to Download the File" class="underline-on-hover">{{item['inputFileName']}}</span>
+         </template>
+    </p-column>
+    <p-column header='File Type' [style]="{'text-align':'center', 'width': '10%'}" >
+        <template let-col let-item="rowData" pTemplate="body">
+            <span *ngIf="item['inputFileType'] == 'VR'">View Receipts</span>
+            <span *ngIf="item['inputFileType'] == 'CR'">Credit Returns</span>
+            <span *ngIf="item['inputFileType'] == 'DV'">DOMS View</span>
+            <span *ngIf="item['inputFileType'] == 'TV'">Trans View</span>
+        </template>
+    </p-column>
+    <p-column field='createdTimestamp'  header='Created At'  [style]="{'text-align':'center','width': '12%'}" title="Eastern Time (USA)"></p-column>
+    <p-column field='scheduledTimestamp' header='Scheduled At' [sortable]="true" [style]="{'text-align':'center','width': '12%'}" [filter]="isFilter" 
+        title="Eastern Time (USA)" filterMatchMode="contains" filterPlaceholder="Filter Date"></p-column>
+    <p-column header='Status' [style]="{'text-align':'center', 'width': '8%'}" >
+        <template let-col let-item="rowData" pTemplate="body">
+            <span *ngIf="item['status'] == 'N'">New</span>
+            <span *ngIf="item['status'] == 'C'">Cancelled</span>
+            <span *ngIf="item['status'] == 'F'">Failed</span>
+            <span *ngIf="item['status'] == 'R'">Retried</span>
+            <span *ngIf="item['status'] == 'P'">Processed</span>
+            <!--<span *ngIf="item['status'] == 'I'">Invalid File</span>-->
+        </template>
+    </p-column>
+    <p-column header='Actions' styleClass="col-button" [style]="{'text-align': 'center', 'width': '15%'}" >
+        <template let-col let-item="rowData" pTemplate="body">
+            <button pButton type="button"   icon="fa fa-long-arrow-down" (click)="downloadOutput(item)" iconPos="right" title="Output File Download" [disabled]="!item['outputReportName']"></button>
+            <button pButton type="button"   icon="fa fa-download" (click)="downloadErrorReport(item)" iconPos="right" title="Error File Download" [disabled]="!item['rejectedReportName']"></button>
+            <button pButton type="button"   icon="fa fa-repeat" (click)="retry(item)" iconPos="right" title="Retry" [disabled]="item['status'] != 'F'"></button>
+            <button pButton type="button"   icon="fa fa-times" (click)="cancel(item)" iconPos="right" [disabled]="item['status'] != 'N'" title="Cancel" ></button>
+        </template>
+    </p-column>
+
+</p-dataTable>
+
+<p-dialog header="Retry"  [responsive]="true" 
+showEffect="fade" [modal]="true" width="600" [(visible)]="onRetry" [height]="380" [style]="{'text-align':'left'}" resizable="true" closable="true" maximizable="true">
+   <p>The original Job Schedule Date is already past. Please schedule on future Date/Time and Click on Resubmit. Otherwise by default job will be scheduled to current Date/Time.</p>
+     <hr style="border: 0; height: 2px; background:#2191c0;"/>
+    <p-footer>
+        <div style="text-align:right;">
+           <p-calendar [(ngModel)]="retrySheduleDate" showTime="showTime" hourFormat="24" placeholder="You can schedule your Job Date/Time" readonlyInput="true"></p-calendar>
+           <button type="button" pButton icon="fa-check" (click)="resubmit()" label="Re-Submit" iconPos="right"></button>
+        </div>
+    </p-footer>
+</p-dialog>

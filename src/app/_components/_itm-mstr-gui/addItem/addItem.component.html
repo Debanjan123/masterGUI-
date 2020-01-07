@@ -1,0 +1,872 @@
+<br/>
+<br/> 
+<p-panel [style]="{'width':'95%', 'margin':'auto'}" (keyup.enter)="_backToSearchNo()">
+    <p-header>
+        <div style="margin:auto; text-align:left;">
+            <div class="ui-grid-col-8">
+                <span> {{componentTitleForAddNew}}</span>
+            </div>
+        </div>
+    </p-header>
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="msgs" autoUpdate="true" [closable]="true"></p-messages>
+        <p-messages [(value)]="warnMsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <div id="successMsg" style="text-align:left;">
+        <p-growl [(value)]="successMsgs"></p-growl>
+    </div>
+
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 70%; text-align:left;">
+                <div style="width: 100%;">
+                    <span style="font-weight:bold">Item #:&nbsp;</span>
+                    <p-autoComplete #divselectelm [(ngModel)]="fromDiv" [maxlength]="2" placeholder="DIV" [inputStyle]="{width:'55px'}" [inputStyleClass]="fieldStatus['mainDiv'].cssClass"
+                        [suggestions]="divSuggestions" (keyup)='onDivKeyUp($event)' (onBlur)="onBlurDiv($event)" onPaste="return false"
+                        (completeMethod)="divSearch($event)">
+                    </p-autoComplete>
+                    <p-autoComplete #plsselectelm [(ngModel)]="fromPls" [maxlength]="3" minLength="2" placeholder="PLS" [inputStyle]="{width:'65px'}"
+                        [inputStyleClass]="fieldStatus['mainPls'].cssClass" [suggestions]="plsSuggestions" (keyup)='onPlsKeyUp($event)'
+                        (onBlur)="onBlurPls($event)" onPaste="return false" (completeMethod)="plsSearch($event)">
+                    </p-autoComplete>
+                    <input type="text" #focusFromPart pInputText placeholder="PART" [(ngModel)]="fromPart" [class.red-border]="!fieldStatus['mainPartNo'].valid"
+                        maxlength="24" style="width: 55%;" (keyup)="addFromPart($event)" />
+                </div>
+            </td>
+            <td style="width: 30%; text-align:left;">
+                <div style="text-align:left;">
+                    <button pButton type="text" icon="fa fa-undo" iconPos="right" title="Back to Search" (click)="_backToSearch()"></button>
+                    <button pButton type="text" icon="fa fa-database" iconPos="right" title="Save your new Item to Database" (click)="_addNewItem()"
+                        [disabled]="isSubmitToDBDisable"></button>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <br/>
+    <div>
+        <hr style="border: 0; height: 2px; background:#2191c0;" />
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 30%; text-align:left;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 36%; text-align:left;">
+                                <span style="font-weight:bold;">Description:&nbsp;</span>
+                            </td>
+                            <td style="width: 64%; text-align:left;">
+                                <input #descselectelm type="text" pInputText [(ngModel)]="item.mainDesc" maxlength="12" [class.red-border]="!fieldStatus['itemDescription'].valid"
+                                    (keyup)='validateItemDescription()' (blur)="validateItemDescription()" (mouseout)="validateItemDescription()"
+                                />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 15%; text-align:left;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 30%; text-align:left;">
+                                <span style="font-weight:bold;">Son:&nbsp;</span>
+                            </td>
+                            <td style="width: 70%; text-align:left;">
+                                <p-inputMask mask="?9999" [styleClass]="fieldStatus['son'].cssClass" slotChar=" " [style]="{'width':'100%'}" [(ngModel)]="item.mainSon"
+                                    unmask="true" (onBlur)="validateDivSon()"></p-inputMask>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 25%; text-align:left;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 62%; text-align:left;">
+                                <span style="font-weight:bold;">Date Added:&nbsp;</span>
+                            </td>
+                            <td style="width: 38%; text-align:left;">
+                                <span style="font-weight:normal;">{{item.mainDateAdded}}</span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 20%; text-align:left;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 50%; text-align:left;">
+                                <span style="font-weight:bold;">Byr No:&nbsp;</span>
+                            </td>
+                            <td style="width: 50%; text-align:left;">
+                                <p-inputMask mask="?99" [styleClass]="fieldStatus['buyerAuth'].cssClass" slotChar=" " [style]="{'width':'100%'}" [(ngModel)]="item.mainBuyerNo"
+                                    maxlength="2" unmask="true" (onBlur)="validateBuyerNo()"></p-inputMask>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <table style="width: 90%;">
+            <tr>
+                <td style="width: 100%; text-align:left;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 15%; text-align:left;">
+                                <span style="font-weight:bold;">Comments:&nbsp;</span>
+                            </td>
+                            <td style="width: 85%; text-align:left;">
+                                <input type="text" pInputText [(ngModel)]="item.mainComments" maxlength="60" [class.red-border]="!fieldStatus['comments'].valid"
+                                    style="width: 100%;" (keyup)='validateComments()' (blur)="validateComments()" (mouseout)="validateComments()"
+                                />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 100%; text-align:left;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 15%; text-align:left;">
+                                <span style="font-weight:bold;">Buyer Notes:&nbsp;</span>
+                            </td>
+                            <td style="width: 85%; text-align:left;">
+                                <input type="text" pInputText [(ngModel)]="item.mainBuyerNotes" maxlength="100" style="width: 100%;" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <br/>
+    <div style="width: 100%; margin:  auto;">
+        <p-tabView>
+            <p-tabPanel header="MAIN" [selected]="true">
+                <br/>
+                <table style="width: 90%;">
+                    <tr>
+                        <td style="width: 30%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Stock UOM:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainStockUom}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 30%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Effective Date:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainEffectiveDate}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 30%; text-align:left;">
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">SIC Code:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainSicCd}}</span>
+                                    </td>
+
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Cost:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <input type="text" pInputText [class.red-border]="!fieldStatus['cost'].valid" [(ngModel)]="item.mainCostPrice" maxlength="8"
+                                            style="width: 60%;" (blur)="checkCostPriceFormat()" (keyup)='onCostPriceKeyUp($event)' (mouseout)='onCostPriceKeyUp($event)'
+                                        />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 30%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Suffix:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainCostSuffix}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Certification:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainCertification}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Sell Price:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <input type="text" pInputText [class.red-border]="!fieldStatus['sellPrice'].valid" [(ngModel)]="item.mainSellPrice" maxlength="8"
+                                            style="width: 60%;" (blur)="checkSellPriceFormat()" (keyup)='onSellPriceKeyUp($event)' (mouseout)='onSellPriceKeyUp($event)'
+                                        />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Suffix:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainSellSuffix}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Hazard Code:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <input type="text" pInputText [class.loading]="fieldStatus['hazardCd'].loading" [class.red-border]="!fieldStatus['hazardCd'].valid"
+                                            [(ngModel)]="item.mainHazardCd" maxlength="8" style="width: 43%;" (blur)="validateHazardCode()"
+                                        />
+                                        <button pButton type="text" icon="fa fa-search" title="Hazard Code Lookup" (click)="onHazardCodeLookup()"></button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">List Price:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <input type="text" pInputText [class.red-border]="!fieldStatus['listPrice'].valid" [(ngModel)]="item.mainListPrice" maxlength="8"
+                                            style="width: 60%;" (blur)="checkListPriceFormat()" (keyup)='onListPriceKeyUp($event)' (mouseout)='onListPriceKeyUp($event)'
+                                        />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Disc%:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <input type="text" pInputText [class.red-border]="!fieldStatus['discountPercent'].valid" [(ngModel)]="item.mainDiscPercent"
+                                            maxlength="4" style="width: 90%;" (blur)="checkDistPctFormat()" (keyup)='onDistPctKeyUp($event)' (mouseout)='onDistPctKeyUp($event)'
+                                        />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Marked For Deletion:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isMrkdFrDeletion" [disabled]="true"></p-inputSwitch>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Exchange Price:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <input type="text" pInputText [class.red-border]="!fieldStatus['exchangePrice'].valid" [(ngModel)]="item.mainExchangePrice"
+                                            maxlength="8" style="width: 60%;" (blur)="checkExchangePriceFormat()" (keyup)="onExchangePriceKeyUp($event)" (mouseout)='onExchangePriceKeyUp($event)'
+                                        />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Margin%:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainMarkupPercent}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Substituted:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainSubstituted}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Exempted from Min Price:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <p-triStateCheckbox [(ngModel)]="mainExemptedFromMinPriceDisplay" (onChange)="onMinimumPriceExemptionChange()"></p-triStateCheckbox>
+                                        <span style="font-weight:normal;">{{item.mainExemptedFromMinPrice}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Zero Cost:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isZeroCost"></p-inputSwitch>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Reinstate:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isReinstated" disabled="true"></p-inputSwitch>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Alpha Code:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <input type="text" pInputText [(ngModel)]="item.mainAlphaCd" style="width: 43%;" [class.red-border]="!fieldStatus['alphaCode'].valid"
+                                            (blur)="validateAlphaCode()" (keyup)="validateAlphaCode()" (mouseout)="validateAlphaCode()"
+                                        />
+                                        <button pButton type="text" icon="fa fa-search" title="Alpha Code Lookup" (click)="onAlphaCodeLookup()"></button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Next:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.mainNext}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <br/>
+                <br/>
+            </p-tabPanel>
+            <p-tabPanel header="MISC">
+                <br/>
+                <table style="width: 90%;">
+                    <tr>
+                        <td style="width: 30%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Factory Pack:&nbsp;</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">UPC Code:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscUpc}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; text-align:right;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 30%; text-align:right;">
+                                        <span style="font-weight:bold;">Code:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscFactPackCd}}</span>
+                                    </td>
+                                    <td style="width: 20%; text-align:right;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Related Model#:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                       <input type="text" pInputText [class.red-border]="!fieldStatus['relatedModelNo'].valid"  [(ngModel)]="item.miscRelatedModelNum" [disabled]="isEditMode" maxlength="20" style="width: 76%;"
+                                            (blur)="relatedModelValidation()" (keyup)='relatedModelValidation()' (mouseout)='relatedModelValidation()'/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 30%; text-align:right;">
+                                        <span style="font-weight:bold;">Quantity:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscFactPackQty > 0 ">{{item.miscFactPackQty}}</span>
+                                    </td>
+                                    <td style="width: 20%; text-align:right;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Seasonal:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscSeasonalCd}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 30%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 30%; text-align:right;">
+                                        <span style="font-weight:bold;">UOM:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{this.item.miscFactPackUom}}</span>
+                                    </td>
+                                    <td style="width: 20%; text-align:right;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Impulse:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscImpulseCd}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 30%; text-align:right;">
+                                        <span style="font-weight:bold;">Weight:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscFactPackWtLb > 0 ">{{item.miscFactPackWtLb}}&nbsp;lb</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscFactPackWtOz > 0 ">{{item.miscFactPackWtOz}}&nbsp;oz</span>
+                                    </td>
+                                    <td style="width: 10%; text-align:left;">
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Promotional:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscPromotionalCd}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 30%; text-align:right;">
+                                        <span style="font-weight:bold;">Length:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscLengthFt > 0 ">{{item.miscLengthFt}}&nbsp;ft</span>
+                                    </td>
+
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscLengthIn > 0 ">{{item.miscLengthIn}}&nbsp;in</span>
+                                    </td>
+                                    <td style="width: 10%; text-align:left;">
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Functional:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscFunctionalCd}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 30%; text-align:right;">
+                                        <span style="font-weight:bold;">Width:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscWidthFt > 0 ">{{item.miscWidthFt}}&nbsp;ft</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscWidthIn > 0 ">{{item.miscWidthIn}}&nbsp;in</span>
+                                    </td>
+                                    <td style="width: 10%; text-align:left;">
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Special:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <input type="text" pInputText [(ngModel)]="item.miscSpecialCd" maxlength="3" style="width: 35%;" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 30%; text-align:right;">
+                                        <span style="font-weight:bold;">Height:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscHeightF > 0 ">{{item.miscHeightF}}&nbsp;ft</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscHeightIn > 0 ">{{item.miscHeightIn}}&nbsp;in</span>
+                                    </td>
+                                    <td style="width: 10%; text-align:left;">
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">Shippable:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscShippableCd}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 30%; text-align:right;">
+                                        <span style="font-weight:bold;">Weight:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscWeightLb > 0">{{item.miscWeightLb}}&nbsp;lb</span>
+                                    </td>
+                                    <td style="width: 30%; text-align:left;">
+                                        <span style="font-weight:normal;" *ngIf="item.miscWeightOz > 0">{{item.miscWeightOz}}&nbsp;oz</span>
+                                    </td>
+                                    <td style="width: 10%; text-align:left;">
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">NMFC number:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscNmfcNum}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">&nbsp;</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align:left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:bold;">NMFC suffix:&nbsp;</span>
+                                    </td>
+                                    <td style="width: 50%; text-align:left;">
+                                        <span style="font-weight:normal;">{{item.miscNmfcSuff}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <br/>
+                <br/>
+            </p-tabPanel>
+            <p-tabPanel header="SUBS">
+                <br/>
+                <p-dataTable [value]="historySubData.substitutionDetails" [rows]="10" selectionMode="single" [(selection)]="selectedSubedItem"
+                    (onRowSelect)="onRowSelect($event)" title="Click 'Next Row' to Add new Next Sub record">
+                    <p-column field='rowHeader' header='' [filter]="isFilter" filterMatchMode="contains" [style]="{'font-size':'medium', 'font-weight':'bold', 'text-align':'center', 'width':'15%','background-color': 'rgb(0, 120, 174)'}">
+                        <template let-col let-item="rowData" pTemplate="body">
+                            <span style="float:left;color: #ffffff;">{{item['label']}}</span>
+                        </template>
+                    </p-column>
+                    <p-column field='div' header='Div' [filter]="isFilter" filterMatchMode="contains" [style]="{'font-size':'medium', 'font-weight':'bold', 'text-align':'center', 'width':'8%'}">
+                        <template let-col let-item="rowData" pTemplate="body">
+                            <span style="float:left;">{{item['div']}}</span>
+                        </template>
+                    </p-column>
+                    <p-column field='pls' header='PLS' [style]="{'font-size':'medium', 'font-weight':'bold', 'text-align':'center', 'width':'8%'}">
+                        <template let-col let-item="rowData" pTemplate="body">
+                            <span style="float:left;">{{item['pls']}}</span>
+                        </template>
+                    </p-column>
+                    <p-column field='part' header='Part' [style]="{'font-size':'medium', 'font-weight':'bold', 'text-align':'center', 'width':'25%'}">
+                        <template let-col let-item="rowData" pTemplate="body">
+                            <span style="float:left;">{{item['part']}}</span>
+                        </template>
+                    </p-column>
+                    <p-column field='subDescription' header='Sub Description' [style]="{'font-size':'medium', 'font-weight':'bold', 'text-align':'center', 'width':'25%'}">
+                        <template let-col let-item="rowData" pTemplate="body">
+                            <span style="float:left;">{{item['subItemDesc']}}</span>
+                        </template>
+                    </p-column>
+                    <p-column field='effectiveDate' header='Effective Date' [style]="{'font-size':'medium', 'font-weight':'bold', 'text-align':'center', 'width':'16%'}">
+                        <template let-col let-item="rowData" pTemplate="body">
+                            <span style="float:left;">{{item['effectiveDate']}}</span>
+                        </template>
+                    </p-column>
+                    <p-column field='buyerNo' header='Buyer No.' [style]="{'font-size':'medium', 'font-weight':'bold', 'text-align':'center', 'width':'9%'}">
+                        <template let-col let-item="rowData" pTemplate="body">
+                            <span style="float:left;">{{item['authBuyerId']}}</span>
+                        </template>
+                    </p-column>
+                    <p-column field='subWayCd' header='Sub  Way Code' [style]="{'font-size':'medium', 'font-weight':'bold', 'text-align':'center', 'width':'9%'}">
+                        <template let-col let-item="rowData" pTemplate="body">
+                            <span style="float:left;">{{item['subWayCd']}}</span>
+                        </template>
+                    </p-column>
+                </p-dataTable>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+</p-panel>
+<br/>
+<br/>
+
+<p-dialog header="Alpha Code" [(visible)]="fieldStatus['alphaCode']['dialogBox-visible']" *ngIf="fieldStatus['alphaCode']['dialogBox-visible']"
+    [width]="500" modal="modal" [height]="auto" [style]="{'text-align':'left'}">
+    <p-dataTable [value]="alphaCode" [lazy]="true" [rows]="5" selectionMode="single" (onRowSelect)="onAlphaCodeSelect($event)">
+        <p-column field="Code" header="Code" [style]="{'width': '15%', 'text-align': 'center'}"></p-column>
+        <p-column field="Description" header="Description" [style]="{'width': '55%'}"></p-column>
+    </p-dataTable>
+</p-dialog>
+
+<p-dialog header="Hazard Code" [(visible)]="fieldStatus['hazardCd']['dialogBox-visible']" *ngIf="fieldStatus['hazardCd']['dialogBox-visible']"
+    [width]="500" modal="modal" [height]="auto" [style]="{'text-align':'left'}">
+    <p-dataTable [value]="hazardCode" selectionMode="single" (onRowSelect)="onHazardCodeSelect($event)" [paginator]="true" [rows]="5">
+        <p-column field="hazardCd" header="Code" [style]="{'width': '20%', 'text-align': 'center'}" [filter]="true" filterPlaceholder="Search"></p-column>
+        <p-column field="description" header="Description" [style]="{'width': '60%'}" [filter]="true" filterPlaceholder="Search"></p-column>
+        <p-column header="Status" [style]="{'width': '20%'}">
+            <template let-col let-item="rowData" pTemplate="body">
+                <span *ngIf="item['activeStatus'] == 'A'">Active</span>
+                <span *ngIf="item['activeStatus'] == 'I'">Inactive</span>
+            </template>
+        </p-column>
+    </p-dataTable>
+</p-dialog>
+
+<p-dialog header="Add Sub Next Record" [(visible)]="fieldStatus['nextSubstitute']['dialogBox-visible']" *ngIf="fieldStatus['nextSubstitute']['dialogBox-visible']" [width]="500"
+    modal="modal" [height]="300" [style]="{'text-align':'left'}" [responsive]="true" showEffect="fade">
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="subMessages" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <br/>
+
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Div</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['nextSubstitute']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="div" [(ngModel)]="subedItem['div']" maxlength="2" [style]="{'width':'30%'}" (blur)="checkLeftPadDivPls($event)"
+                    (keyup)='onSubDivKeyUp($event)' /></div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="pls">Pls</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['nextSubstitute']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="pls" [(ngModel)]="subedItem['pls']" maxlength="3" [style]="{'width':'30%'}" (blur)="checkLeftPadDivPls($event)"
+                    (keyup)='onSubPlsKeyUp($event)' /></div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="part">Part</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['nextSubstitute']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="part" [(ngModel)]="subedItem['part']" maxlength="24" [style]="{'width':'80%'}" (blur)="subPartValidation($event)" (keyup)='onSubPartKeyUp($event)'/></div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="authBuyerId">Buyer No</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['nextSubstitute']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <input pInputText id="authBuyerId" [class.loading]="fieldStatus['subBuyerId'].loading" [class.red-border]="!fieldStatus['subBuyerId'].valid" [(ngModel)]="subedItem['buyerNo']" maxlength="2" (keyup)="onSubBuyerNoKeyUp($event)" (blur)="validateSubBuyerNo()"
+                    [style]="{'width':'30%'}" />            
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="subWayCd">Sub  Way Code</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['nextSubstitute']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="subWayCd" [(ngModel)]="subedItem['subWayCd']" maxlength="1" (keyup)="onSubWayCdKeyUp($event)"
+                /></div>
+        </div>
+    </div>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="clearSubedData()" label="Clear"></button>
+            <button type="button" pButton icon="fa-check" [disabled]="!fieldStatus['nextSubstitute']['saveEnabled']" (click)="subItemSave()" label="Save"></button>
+        </div>
+    </p-footer>
+</p-dialog>
+
+<p-dialog #isConfirm header="Confirmation" [(visible)]="isConfirmDialogVisible" *ngIf="isConfirmDialogVisible" [width]="500"
+    [modal]="true" [height]="auto" [style]="{'text-align':'left'}">
+    All of the changes made will be discarded. Do you want to proceed?
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button #isNo type="button" pButton icon="fa-close" (click)="_backToSearchNo()" label="No"></button>
+            <button #isYes type="button" pButton icon="fa-check" (click)="_backToSearchYes()" label="Yes"></button>
+        </div>
+    </p-footer>
+</p-dialog>

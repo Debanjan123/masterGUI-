@@ -1,0 +1,152 @@
+<br/>
+<br/>
+<div id="msg" style="text-align:left;">
+    <p-growl [(value)]="successMsgs"></p-growl>
+</div>
+<div id="msg" style="text-align:left; width:95%;margin:auto">
+    <p-messages [(value)]="msgs" autoUpdate="true" [closable]="true"></p-messages>
+    <p-messages [(value)]="warnMsgs" autoUpdate="true" [closable]="true"></p-messages>
+</div>
+<p-dataTable #hazardDatatable [style]="{'width':'95%', 'margin':'auto'}" [value]="hazardData" [paginator]="true" [rows]="15"
+    selectionMode="single" [(selection)]="selectedRow" dataKey="userName" (onRowSelect)="onRowSelect($event)">
+    <hr style="border: 0; height: 2px; background:#2191c0;" />
+
+    <p-header>
+        <div class="ui-grid ui-grid-responsive ui-grid-pad">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6">
+                    <span style="float:left">Hazmat</span>
+                </div>
+                <div class="ui-grid-col-6">
+                    <span style="float:right">
+                        <button pButton type="text" label="New Hazmat Cd" icon="fa fa-plus" iconPos="right" (click)="onNewHazard()"></button>
+                     </span>
+                </div>
+            </div>
+        </div>
+    </p-header>
+
+    <p-column field="hazardCd" header="Hazmat Code" [style]="{'width': '15%', 'text-align': 'left', 'font-size':'small'}" [sortable]="true"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="description" header="Description" [style]="{'width': '25%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="activeStatus" header="Active" [style]="{'width': '5%', 'text-align': 'left', 'font-size':'small'}" [filter]="true"
+        filterPlaceholder="Search"></p-column>
+    <p-column field="usedFlag" header="Used" [style]="{'width': '5%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="createTime" header="Created On" [style]="{'width': '25%', 'text-align': 'left', 'font-size':'small'}" [filter]="true"
+        filterPlaceholder="Search"></p-column>
+    <p-column field="createId" header="Created By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="updateTime" header="Updated On" [style]="{'width': '25%', 'text-align': 'left', 'font-size':'small'}" [filter]="true"
+        filterPlaceholder="Search"></p-column>
+    <p-column field="updateId" header="Updated By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+</p-dataTable>
+
+
+<p-dialog header="Add New Hazmat Cd" [(visible)]="isNewHazard" *ngIf="isNewHazard" [width]="500" modal="modal" [height]="300"
+    [style]="{'text-align':'left'}">
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="false"></p-messages>
+    </div>
+    <br/>
+
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Hazmat Code</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hazardScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText #hazardCdElm id="div" [(ngModel)]="hazard.hazardCd" maxlength="8" [style]="{'width':'30%'}" [class.loading]="fieldStatus['hazardScrCd'].loading"
+                    [class.red-border]="!fieldStatus['hazardScrCd'].valid" (blur)="validateHazardCode()" (keyup)="onHazardKeyUp()"/></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="pls">Description</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hazardScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="pls" [(ngModel)]="hazard.description" maxlength="30" [style]="{'width':'30%'}" [class.red-border]="!fieldStatus['hazardScrDesc'].valid"
+                    (keyup)="onDescKeyUp()" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="part">Active</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hazardScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isAddActive"></p-inputSwitch>
+            </div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="part">Used</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hazardScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isAddUsed"></p-inputSwitch>
+            </div>
+        </div>
+    </div>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="clearData()" label="Clear"></button>
+            <button type="button" pButton icon="fa-check" [disabled]="!fieldStatus['hazardScr']['saveEnabled']" (click)="newHazardSave()"
+                label="Save"></button>
+        </div>
+    </p-footer>
+</p-dialog>
+
+<p-dialog header="Edit Hazmat Cd" [(visible)]="isEditHazard" *ngIf="isEditHazard" [width]="500" modal="modal" [height]="300"
+    [style]="{'text-align':'left'}">
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <br/>
+
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Hazmat Code</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="div" [(ngModel)]="hazard.hazardCd" maxlength="8" [style]="{'width':'30%'}" disabled="true"
+                /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="pls">Description</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hazardScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="pls" [(ngModel)]="hazard.description" maxlength="30" [style]="{'width':'30%'}" [class.red-border]="!fieldStatus['hazardScrDesc'].valid"
+                    (keyup)="onDescKeyUp()" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="part">Active</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hazardScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isEditActive" (onChange)="onChangeSwitch()"></p-inputSwitch>
+            </div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="part">Used</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hazardScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isEditUsed" (onChange)="onChangeSwitch()"></p-inputSwitch>
+            </div>
+        </div>
+    </div>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="hideEditDialog()" label="Cancel"></button>
+            <button type="button" pButton icon="fa-check" [disabled]="!fieldStatus['hazardScr']['saveEnabled']" (click)="newHazardSave()"
+                label="Save"></button>
+        </div>
+    </p-footer>
+</p-dialog>

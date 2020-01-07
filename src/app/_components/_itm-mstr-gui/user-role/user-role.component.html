@@ -1,0 +1,62 @@
+
+<br/>
+<br/> 
+
+<div class="ex1" style="text-align:left;" >
+    <p-messages [(value)]="msgs"  autoUpdate="true" [closable]="true"></p-messages>
+</div>
+<div id="msg" style="text-align:left;">
+    <p-growl [(value)]="successMsgs"></p-growl>
+</div>
+    
+<p-dataTable [style]="{'width':'95%', 'margin':'auto'}"  [value]="userRoles"  [paginator]="isPaginator"
+[rows]="10" selectionMode="single" [(selection)]="selectedRow" dataKey="userName" (onRowSelect)="onRowSelect($event)" [lazy]="true" (onLazyLoad)="loadUserRolesLazy($event)"  [totalRecords]="totalRecords">
+     <hr style="border: 0; height: 2px; background:#2191c0;"/>
+    <p-header>
+         <div class="ui-grid ui-grid-responsive ui-grid-pad">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6">
+                    <span style="float:left">User Assigned Role</span>
+                </div>
+                <div class="ui-grid-col-6">
+                    <span style="float:right">
+                        <button pButton type="text" label="New User Roles" icon="fa fa-plus" iconPos="right" (click)="onNewUserRoles()"></button>
+                     </span>
+                </div>
+            </div>
+        </div>
+    </p-header>    
+    <p-column field="userName" header="User" [style]="{'width': '20%', 'text-align': 'center','font-size':'small'}"></p-column>
+    <p-column field="roles" header="Assigned Roles" [style]="{'width': '80%','font-size':'small'}"  class="overflow ellipsis" ></p-column>
+</p-dataTable>
+
+<p-dialog header="User Roles Assignment"  [(visible)]="isNewUserRolesDialogDisplay" *ngIf="isNewUserRolesDialogDisplay"
+    [width]="1000" modal="modal" [height]="auto" [style]="{'text-align':'left'}">
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="subMessages" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <p-fieldset legend="User Roles Mapping" align="left" >
+        <table>
+            <tr>
+                <td>
+                    <span style="font-weight:bold; font-size:small">User ID #:&nbsp;</span>
+                    <input type="text"  [(ngModel)]="userLdap" pInputText  placeholder="User LDAP ID" style="width: 120px;font-size:small" [disabled]="!isNewUser"/>
+                </td>
+                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>
+                    <span style="font-weight:bold; font-size:small">User Roles #:&nbsp;</span>
+                </td>
+                <td>
+                  <p-listbox [options]="roles" [(ngModel)]="selectedRoles" optionLabel="name" multiple="multiple" checkbox="checkbox" filter="filter" [style]="{'width':'400px','font-size':'small'}" ></p-listbox>
+                </td>
+              </tr>
+           </table>
+         <p-footer>
+            <hr style="border: 0; height: 2px; background:#2191c0;"/>
+            <div style="text-align:right;">
+                <button pButton type="text" label="Save" icon="fa fa-floppy-o" iconPos="right" (click)="onUserRoleSubmit()"></button>
+                <button pButton type="text" label="Delete" icon="fa fa-trash-o" iconPos="right" (click)="onUserDeleteSubmit()" *ngIf="!isNewUser"></button>
+            </div>
+         </p-footer>  
+    </p-fieldset>
+</p-dialog>

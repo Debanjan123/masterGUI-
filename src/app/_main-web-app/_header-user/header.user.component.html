@@ -1,0 +1,44 @@
+<p-splitButton *ngIf="isVisible" label="{{ loggedInUserGivenName }}" icon="fa fa-user" [menuStyle]="{'font-size':'medium','width': '100%',
+'color':'black'}" [model]="items" (onClick)="onNameClick()"></p-splitButton>
+
+<p-dialog header="Profile" [(visible)]="isDialogVisible" modal="modal" responsive="true" [style]="{'text-align':'left'}"
+    width="600">
+    <div class="ui-grid ui-grid-responsive ui-grid-pad">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6" style="text-align:left">
+                <span style="font-weight:bold;">ID:</span>
+            </div>
+            <div class="ui-grid-col-6" style="text-align:left">
+                {{ loggedInUserId }}
+            </div>
+        </div>
+
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6" style="text-align:left">
+                <span style="font-weight:bold;">Name:</span>
+            </div>
+            <div class="ui-grid-col-6" style="text-align:left">
+                {{ loggedInUserName }}
+            </div>
+        </div>
+
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6" style="text-align:left">
+                <span style="font-weight:bold;">Title:</span>
+            </div>
+            <div class="ui-grid-col-6" style="text-align:left">
+                {{ loggedInUserTitle }}
+            </div>
+        </div>
+
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6" style="text-align:left">
+                <span style="font-weight:bold;">Email:</span>
+            </div>
+            <div class="ui-grid-col-6" style="text-align:left">
+                {{ loggedInUserEmail }}
+            </div>
+        </div>
+
+    </div>
+</p-dialog>

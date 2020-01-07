@@ -1,0 +1,50 @@
+<p-panel [style]="{'width' : '25%', 'left': '37%', 'top':'15%', 'position':'absolute'}">
+    <p-header>
+        <div class="ui-helper-clearfix" style="text-align: left !important;">
+            <i class="fa fa-user"></i>
+            <span class="ui-panel-title" icon="fa fa-user">
+                Login
+            </span>
+        </div>
+    </p-header>
+    <div class="ui-grid ui-grid-responsive ui-grid-pad">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-1" style="width: 100%; text-align: left; padding: 1px;">
+                <p-messages [value]="msgs"></p-messages>
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-1" style="width: 100%; text-align: left; padding: 1px;">
+                <span style="font-weight: bold;"><i class="fa fa-user"></i>&nbsp;User ID</span>
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-1" style="width: 100%; text-align: left; padding: 1px;">
+                <input type="text" pInputText placeholder="Enterprise ID" style="width: 100%;" 
+                    [(ngModel)]="userId" #userIdInput
+                    (keyup)="onKeyUp($event)"/>
+            </div>
+        </div>
+        <br/>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-1" style="width: 100%; text-align: left; padding: 1px;">
+                <span style="font-weight: bold;"><i class="fa fa-key"></i>&nbsp;Password</span>
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-1" style="width: 100%; text-align: left; padding: 1px;">
+                <input type="password" pInputText placeholder="Password" style="width: 100%;" [(ngModel)]="password"
+                    (keyup)="onKeyUp($event)" #passwordInput />
+            </div>
+        </div>
+    </div>
+    
+    <br/>
+    <hr style="border: 0; height: 2px; background:#2191c0;"/>
+    <button pButton type="text" (click)="login()" label="Login" icon="fa fa-user" iconPos="right"
+        [disabled]="isLoginButtonDisabled"
+        style="float:left;"></button>
+     <br/><br/>
+      Forgot your <a class="a-custom" href="http://it.intra.sears.com/it/ds/user/lookupid.php">username</a> or
+                <a a class="a-custom" href="https://it.intra.sears.com/it/ds/user/resetpw.php">password</a>?
+</p-panel>

@@ -1,0 +1,120 @@
+<br/>
+<br/>
+<p-panel [style]="{'width':'95%', 'margin':'auto'}" (keyup.enter)="_onEnterKey($event)" (keyup.control.ArrowRight)="onForwardKey($event)">
+    <p-header>
+        <div style="margin:auto; text-align:left;">
+            <div class="ui-grid-col-8">
+                <span> {{componentTitleForBuyerAuth}}</span>
+            </div>
+        </div>
+    </p-header>
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="msgs" autoUpdate="true" [closable]="true"></p-messages>
+        <p-messages [(value)]="warnMsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <div id="msg" style="text-align:left;">
+        <p-growl [(value)]="successMsgs"></p-growl>
+    </div>
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 70%; text-align:left;">
+                <div style="width: 100%;">
+                    <span style="font-weight:bold"> Search Buyer Information:&nbsp;</span>
+                    <p-autoComplete [(ngModel)]="authBuyerIdLookup" [maxlength]="2" placeholder="Buyer No." [inputStyle]="{width:'85px'}" (keyup)="onSearchBuyerAuthKeyUp()">
+                    </p-autoComplete>
+                </div>
+            </td>
+            <td style="width: 30%; text-align:left;">
+                <div style="text-align:left;">
+                    <button #focusSearch pButton type="text" icon="fa fa-search" iconPos="right" (click)="BuyerAuthDatatable.reset();" title="Search Buyer Auth"></button>
+                    <button pButton type="text" title="New Buyer Auth" icon="fa fa-plus" iconPos="right" (click)="onNewBuyerAuth()"></button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</p-panel>
+
+<p-dataTable #BuyerAuthDatatable [style]="{'width':'95%', 'margin':'auto'}" [value]="BuyerAuthData" [paginator]="true" [rows]="noOfRecordsPerPage"
+    [totalRecords]="totalRecords" selectionMode="single" [(selection)]="selectedRow" dataKey="userName" (onRowSelect)="onRowSelect($event)"
+    [lazy]="true" (onLazyLoad)="loadBuyerAuthLazy($event)">
+    <hr style="border: 0; height: 2px; background:#2191c0;" />
+    <p-column field="authBuyerId" header="Buyer No." [style]="{'width': '10%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="authBuyerName" header="Buyer Name" [style]="{'width': '20%', 'text-align': 'left','font-size':'small'}"
+        class="overflow ellipsis"></p-column>
+    <p-column field="createTime" header="Created On" [style]="{'width': '15%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="createId" header="Created By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+    <p-column field="updateTime" header="Updated On" [style]="{'width': '15%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="updateId" header="Updated By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+</p-dataTable>
+
+<p-dialog header="Add New Buyer Auth" [(visible)]="isNewBuyerAuth" *ngIf="isNewBuyerAuth" [width]="500" modal="modal" [height]="300"
+    [style]="{'text-align':'left'}">
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="false"></p-messages>
+    </div>
+    <br/>
+
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="div">Buyer No.</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['BuyerAuthScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6"><input pInputText [(ngModel)]="buyerAuth.authBuyerId" maxlength="2" [style]="{'width':'30%'}" [class.loading]="fieldStatus['addBuyerAuth'].loading"
+                    [class.red-border]="!fieldStatus['addBuyerAuth'].valid" (keyup)="onBuyerAuthKeyUp()" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="pls">Buyer Name</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['BuyerAuthScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6"><input pInputText [(ngModel)]="buyerAuth.authBuyerName" maxlength="20" [style]="{'width':'30%'}" (keyup)="onBuyerNameKeyUp()"
+                /></div>
+        </div>
+        <br>
+    </div>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="clearData()" label="Clear"></button>
+            <button type="button" pButton icon="fa-check" [disabled]="!fieldStatus['BuyerAuthScr']['saveEnabled']" (click)="newBuyerAuthSave()"
+                label="Save"></button>
+        </div>
+    </p-footer>
+</p-dialog>
+
+<p-dialog header="Edit Buyer Auth" [(visible)]="isEditBuyerAuth" *ngIf="isEditBuyerAuth" [width]="500" modal="modal" [height]="300"
+    [style]="{'text-align':'left'}">
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <br/>
+
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="div">Buyer No.</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['BuyerAuthScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6"><input pInputText [(ngModel)]="buyerAuth.authBuyerId" maxlength="2" [style]="{'width':'30%'}" [class.loading]="fieldStatus['addBuyerAuth'].loading"
+                    [class.red-border]="!fieldStatus['addBuyerAuth'].valid" disabled="true" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="pls">Buyer Name</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['BuyerAuthScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6"><input pInputText [(ngModel)]="authBuyerNameEdit" maxlength="20" [style]="{'width':'30%'}" (keyup)="onBuyerNameKeyUp()"
+                /></div>
+        </div>
+        <br>
+    </div>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="hideEditDialog()" label="Cancel"></button>
+            <button type="button" pButton icon="fa-check" (click)="newBuyerAuthSave()" label="Save"></button>
+        </div>
+    </p-footer>
+</p-dialog>

@@ -1,0 +1,189 @@
+<br/>
+<br/>
+<p-panel [style]="{'width':'95%', 'margin':'auto'}" (keyup.enter)="_onEnterKey($event)" (keyup.control.ArrowRight)="onForwardKey($event)">
+    <p-header>
+        <div style="margin:auto; text-align:left;">
+            <div class="ui-grid-col-8">
+                <span> {{componentTitleForDivSon}}</span>
+            </div>
+        </div>
+    </p-header>
+    <div id="msg" style="text-align:left;">
+        <p-growl [(value)]="successMsgs"></p-growl>
+    </div>
+    <div id="msg" style="text-align:left; width:95%;margin:auto">
+        <p-messages [(value)]="msgs" autoUpdate="true" [closable]="true"></p-messages>
+        <p-messages [(value)]="warnMsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 70%; text-align:left;">
+                <div style="width: 100%;">
+                    <span style="font-weight:bold"> Search Div-Son:&nbsp;</span>
+                    <p-autoComplete #divselectelm [(ngModel)]="searchDiv" [maxlength]="2" placeholder="DIV" [inputStyle]="{width:'55px'}" [inputStyleClass]="fieldStatus['mainDiv'].cssClass"
+                        onPaste="return false" (keyup)='onSearchDivKeyUp($event)'>
+                    </p-autoComplete>
+                    <p-autoComplete #plsselectelm [(ngModel)]="searchSon" [maxlength]="4" minLength="3" placeholder="SON" [inputStyle]="{width:'65px'}" [inputStyleClass]="fieldStatus['mainPls'].cssClass"
+                        (keyup)='onSearchSonKeyUp($event)' onPaste="return false">
+                    </p-autoComplete>
+                </div>
+            </td>
+            <td style="width: 30%; text-align:left;">
+                <div style="text-align:left;">
+                    <button pButton type="text" icon="fa fa-search" iconPos="right" (click)="dt.reset();" title="Search Div-Pls"></button>
+                    <button pButton type="text" title="New Div Pls" icon="fa fa-plus" iconPos="right" (click)="onNewDivSon()"></button>
+                    <!--  <button pButton type="text" title="Clear Search Data" icon="fa fa-eraser" iconPos="right" (click)="onClearSearchData()"></button> -->
+                </div>
+            </td>
+        </tr>
+    </table>
+</p-panel>
+<p-dataTable #dt [style]="{'width':'95%', 'margin':'auto'}" [value]="divSonData" [paginator]="isPaginator" [rows]="8" selectionMode="single"
+    [(selection)]="selectedRow" dataKey="userName" (onRowSelect)="onRowSelect($event)" [lazy]="true" (onLazyLoad)="loadLazy($event)"
+    [totalRecords]="totalRecords">
+    <hr style="border: 0; height: 2px; background:#2191c0;" />
+    <p-column field="div" header="DIV" [style]="{'width': '5%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="son" header="SON" [style]="{'width': '7%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="sourceName" header="Source Name" [style]="{'width': '30%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column header="Price Formula" [style]="{'width': '20%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis">
+        <template let-col let-item="rowData" pTemplate="body">
+            <span *ngIf="item['priceFormula'] == 'L'">List price formula</span>
+            <span *ngIf="item['priceFormula'] == 'M'">Markup formula</span>
+            <span *ngIf="item['priceFormula'] == '3'">Cube root formula</span>
+            <span *ngIf="item['priceFormula'] == '5'">Fifth root formula</span>
+        </template>
+    </p-column>
+    <p-column field="authBuyerId" header="Buyer Auth Id" [style]="{'width': '7%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="priceVariable" header="Price Variable" [style]="{'width': '8%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="markupPrct" header="Mark Up %" [style]="{'width': '7%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+    <p-column field="discPct" header="Dist Prct" [style]="{'width': '5%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+    <p-column field="createTime" header="Created On" [style]="{'width': '20%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="createId" header="Created By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+    <p-column field="updateTime" header="Updated On" [style]="{'width': '20%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="updateId" header="Updated By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+</p-dataTable>
+
+
+<p-dialog [(visible)]="isNewDivSon" *ngIf="isNewDivSon" [width]="500" modal="modal" [height]="350" [style]="{'text-align':'left'}">
+    <p-header>
+        <div style="margin:auto; text-align:left;">
+            <div class="ui-grid-col-8">
+                <span *ngIf="addNew">Add New Div Son</span>
+                <span *ngIf="edit">Edit Div Son</span>
+            </div>
+        </div>
+    </p-header>
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="false"></p-messages>
+    </div>
+    <br/>
+
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">DIV</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <input pInputText [(ngModel)]="editdivSon.id.div" maxlength="2" [style]="{'width':'30%'}" (keyup)="onDivKeyUp()" (blur)="onBlurDiv()"
+                    [disabled]="edit" />
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="pls">SON</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText [(ngModel)]="editdivSon.id.son" maxlength="4" [style]="{'width':'30%'}" (keyup)="onSonKeyUp()"
+                    (blur)="onBlurSon()" [disabled]="edit" />
+            </div>
+
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Source Name</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="div" [(ngModel)]="editdivSon.sourceName" maxlength="20" [style]="{'width':'30%'}" (blur)="checkSourceName()"
+                />
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Buyer Auth Id</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-7">
+                <p-inputMask mask="?99" [styleClass]="fieldStatus['buyerAuth'].cssClass" slotChar=" " [style]="{'width':'100%'}" [(ngModel)]="editdivSon.authBuyerId"
+                    maxlength="2" unmask="true" (onBlur)="validateBuyerNo()"></p-inputMask>
+            </div>
+
+            <div class="ui-grid-col-1">
+                <button pButton type="text" icon="fa fa-search" title="Byer Auth Id Lookup" (click)="onByerAuthLookup()"></button>
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Price Formula</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-7"><input pInputText id="div" [(ngModel)]="editdivSon.priceFormula" maxlength="1" [style]="{'width':'20%'}" disabled="true">
+            </div>
+            <div class="ui-grid-col-1">
+                <button pButton type="text" icon="fa fa-search" title="Price Formula Lookup" (click)="onPriceFormulaLookup()"></button>
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Price Variable</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <input type="text" pInputText [class.red-border]="!fieldStatus['divSon'].priceVariableValid" [(ngModel)]="editdivSon.priceVariable"
+                    maxlength="8" style="width: 100%;" (blur)="checkPriceVariableFormat()" (keyup)='onPriceVariableKeyUp($event)'
+                    (mouseout)='onPriceVariableKeyUp($event)' />
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Markup %</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <input type="text" pInputText [(ngModel)]="editdivSon.formulaMarkupPct" maxlength="8" style="width: 100%;" (blur)="checkMarkPrctFormat()"
+                    [class.red-border]="!fieldStatus['divSon'].markUpValid" (keyup)='onMarkPrctKeyUp($event)' (mouseout)='onMarkPrctKeyUp($event)'
+                />
+
+            </div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="div">Discount %</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <input type="text" pInputText [class.red-border]="!fieldStatus['divSon'].distCountValid" [(ngModel)]="editdivSon.discPct"
+                    maxlength="5" style="width: 100%;" (blur)="checkDistPctFormat()" (keyup)='onDistPctKeyUp($event)' (mouseout)='onDistPctKeyUp($event)'
+                />
+
+            </div>
+        </div>
+
+    </div>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="clearData()" label="Clear"></button>
+            <button type="button" pButton icon="fa-check" [disabled]="!fieldStatus['divSon']['saveEnabled']" (click)="divSonSave()" label="Save"></button>
+        </div>
+    </p-footer>
+</p-dialog>
+
+
+<p-dialog header="Price Formula" [width]="500" modal="modal" [height]="auto" [style]="{'text-align':'left'}" [(visible)]="fieldStatus['divSon']['dialogBox-visible-priceFormula']"
+    *ngIf="fieldStatus['divSon']['dialogBox-visible-priceFormula']">
+    <p-dataTable [value]="priceFormula" [rows]="5" selectionMode="single" (onRowSelect)="onPriceFormulaSelect($event)">
+        <p-column field="Code" header="Code" [style]="{'width': '15%', 'text-align': 'center'}"></p-column>
+        <p-column field="Description" header="Description" [style]="{'width': '55%'}"></p-column>
+    </p-dataTable>
+</p-dialog>
+
+<p-dialog header="Buyer Auth" [width]="500" modal="modal" [height]="auto" [style]="{'text-align':'left'}" [(visible)]="fieldStatus['divSon']['dialogBox-visible-buyerAuth']"
+    *ngIf="fieldStatus['divSon']['dialogBox-visible-buyerAuth']">
+    <p-dataTable [value]="buyerAuthData" [paginator]="true" [rows]="5" selectionMode="single" (onRowSelect)="onBuyerAuthSelect($event)">
+        <p-column field="id" header="Id" [style]="{'width': '15%', 'text-align': 'center'}"></p-column>
+        <p-column field="name" header="Name" [style]="{'width': '55%'}"></p-column>
+    </p-dataTable>
+</p-dialog>

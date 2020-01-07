@@ -1,0 +1,207 @@
+<br/>
+<br/>
+<div id="msg" style="text-align:left;">
+    <p-growl [(value)]="successMsgs"></p-growl>
+</div>
+<div id="msg" style="text-align:left; width:95%;margin:auto">
+    <p-messages [(value)]="msgs" autoUpdate="true" [closable]="true"></p-messages>
+    <p-messages [(value)]="warnMsgs" autoUpdate="true" [closable]="true"></p-messages>
+</div>
+
+
+<p-dataTable [style]="{'width':'95%', 'margin':'auto'}" [value]="vendorData" [paginator]="true" [rows]="8"
+    selectionMode="single" [(selection)]="selectedRow" dataKey="vendorName" (onRowSelect)="onRowSelect($event)">
+    <hr style="border: 0; height: 2px; background:#2191c0;" />
+
+    <p-header>
+        <div class="ui-grid ui-grid-responsive ui-grid-pad">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6">
+                    <span style="float:left">View Ship To Vendor</span>
+                </div>
+                <div class="ui-grid-col-6">
+                    <span style="float:right">
+                        <button pButton type="text" label="Add New Vendor" icon="fa fa-plus" iconPos="right" (click)="onNewVendor()"></button>
+                     </span>
+                </div>
+            </div>
+        </div>
+    </p-header>
+
+   
+    <p-column field="vendorName" header="Vendor Name" [style]="{'width': '15%', 'text-align': 'left', 'font-size':'small'}" [sortable]="true"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="vendorAddress" header="Address" [style]="{'width': '20%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="vendorCityName" header="City" [style]="{'width': '20%', 'text-align': 'left', 'font-size':'small'}" [filter]="true"
+        filterPlaceholder="Search"></p-column>
+    <p-column field="vendorStateCd" header="State" [style]="{'width': '5%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="vendorZipCd" header="Zip" [style]="{'width': '10%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="vendorZip4Cd" header="Zip 4 Cd" [style]="{'width': '10%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="vendorActiveDt" header="Created On" [style]="{'width': '10%', 'text-align': 'left', 'font-size':'small'}" [filter]="true"
+        filterPlaceholder="Search"></p-column>
+    <p-column field="createId" header="Created By" [style]="{'width': '10%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column field="updateTime" header="Updated On" [style]="{'width': '10%', 'text-align': 'left', 'font-size':'small'}" [filter]="true"
+        filterPlaceholder="Search"></p-column>
+    <p-column field="updateId" header="Updated By" [style]="{'width': '10%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"
+        [filter]="true" filterPlaceholder="Search"></p-column>
+    <p-column [style]="{'font-size':'10px', 'text-align': 'center', 'width': '3%'}">
+        <template pTemplate="header">
+            <i class="fa fa-recycle"></i>
+        </template>
+        <template let-vendor="rowData" pTemplate="body">
+            <button type="button" title="Remove Item from Cart" pButton icon="fa fa-trash" (click)="selectVendorToDelete(vendor)"></button>
+        </template>
+    </p-column>
+ 
+</p-dataTable>
+
+<p-dialog header="Add New Vendor" [(visible)]="isNewVendor" *ngIf="isNewVendor" [width]="500" modal="modal" [height]="400"
+    [style]="{'text-align':'left'}">
+
+    
+     <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <br/>
+
+     <div class="ui-grid ui-grid-responsive ui-fluid">
+        
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="name">Name</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="name"  [(ngModel)]="shipToVendor.vendorName" maxlength="30" [style]="{'width':'30%'}"  (keyup)="onKeyUp()" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="address">Address</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" ></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="address" [(ngModel)]="shipToVendor.vendorAddress"  maxlength="50" [style]="{'width':'30%'}" 
+                (keyup)="onKeyUp()"     /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="address">City</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" ></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="address" [(ngModel)]="shipToVendor.vendorCityName"  maxlength="25" [style]="{'width':'30%'}"  
+                  (keyup)="onKeyUp()"   /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="state">State</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" ></i></span>
+            </div>
+            <div class="ui-grid-col-8">
+                <!--<input pInputText id="state" [(ngModel)]="shipToVendor.vendorStateCd" maxlength="2" [style]="{'width':'30%'}" 
+                /> -->
+              <p-dropdown [options]='stateCd' [(ngModel)]="shipToVendor.vendorStateCd" [style]="{'width':'90%'}" [filter]="true" filterBy="label,value.name"></p-dropdown>
+            </div>
+        </div> 
+
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="zip">Zip Cd</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" ></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="zip" [(ngModel)]="shipToVendor.vendorZipCd" maxlength="5" (keyup)="onZipKeyUp()" [style]="{'width':'30%'}" 
+              /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="zip">Zip 4 Cd</label>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="zip" [(ngModel)]="shipToVendor.vendorZip4Cd" maxlength="4" [style]="{'width':'30%'}" 
+                  (keyup)="onZip4KeyUp()"   /></div>
+        </div>
+        
+    </div>
+    <br>
+    <br>
+    <br>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="hideDialog()" label="Cancel"></button>
+            <button type="button" pButton icon="fa-check" (click)="vendorAddressSave()" [disabled]="!fieldStatus['ShipToVendor']['saveEnabled']"
+                label="Save"></button>
+        </div>
+    </p-footer>
+
+</p-dialog>
+
+
+<p-dialog header="Edit Hazmat Cd" [(visible)]="isEditVendor" *ngIf="isEditVendor" [width]="500" modal="modal" [height]="400"
+    [style]="{'text-align':'left'}">
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <br/>
+    
+     <div class="ui-grid ui-grid-responsive ui-fluid">
+         
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="name">Name</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk"></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="name"  [(ngModel)]="shipToVendor.vendorName" maxlength="30" [style]="{'width':'30%'}" disabled="true"
+            (keyup)="onKeyUp()"/></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="address">Address</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" ></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="address" [(ngModel)]="shipToVendor.vendorAddress"  maxlength="50" [style]="{'width':'30%'}" 
+                (keyup)="onKeyUp()"    /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="address">City</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" ></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="address" [(ngModel)]="shipToVendor.vendorCityName"  maxlength="25" [style]="{'width':'30%'}" 
+              (keyup)="onKeyUp()"       /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="state">State</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" ></i></span>
+            </div>
+           <div class="ui-grid-col-8">
+              <p-dropdown [options]='stateCd' [(ngModel)]="shipToVendor.vendorStateCd" [style]="{'width':'90%'}" [filter]="true" filterBy="label,value.name"  (onChange)="stateOnChange();"></p-dropdown>
+           </div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="zip">Zip Cd</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" ></i></span>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="zip" [(ngModel)]="shipToVendor.vendorZipCd" maxlength="5" [style]="{'width':'30%'}" (keyup)="onZipKeyUp()" 
+                /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4"><label for="zip">Zip 4 Cd</label>
+            </div>
+            <div class="ui-grid-col-8"><input pInputText id="zip" [(ngModel)]="shipToVendor.vendorZip4Cd" maxlength="4" [style]="{'width':'30%'}" 
+                 (keyup)="onZip4KeyUp()"  /></div>
+        </div>
+     </div>
+    
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="hideDialog()" label="Cancel"></button>
+            <button type="button" pButton icon="fa-check" (click)="vendorAddressSave()" [disabled]="!fieldStatus['ShipToVendor']['saveEnabled']"
+                label="Save"></button>
+          </div>
+    </p-footer>
+
+</p-dialog>
+

@@ -1,0 +1,145 @@
+<br/>
+<br/>
+<p-panel [style]="{'width':'95%', 'margin':'auto'}" (keyup.enter)="_onEnterKey($event)" (keyup.control.ArrowRight)="onForwardKey($event)">
+    <p-header>
+        <div style="margin:auto; text-align:left;">
+            <div class="ui-grid-col-8">
+                <span> {{componentTitleForDivPls}}</span>
+            </div>
+        </div>
+    </p-header>
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="msgs" autoUpdate="true" [closable]="true"></p-messages>
+        <p-messages [(value)]="warnMsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <div id="msg" style="text-align:left;">
+        <p-growl [(value)]="successMsgs"></p-growl>
+    </div>
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 70%; text-align:left;">
+                <div style="width: 100%;">
+                    <span style="font-weight:bold"> Search Div-Pls:&nbsp;</span>
+                    <p-autoComplete #divselectelm [(ngModel)]="fromDiv" [maxlength]="2" placeholder="DIV" [inputStyle]="{width:'55px'}" [inputStyleClass]="fieldStatus['mainDiv'].cssClass"
+                        [suggestions]="divSuggestions" (keyup)='onSearchDivKeyUp($event)' (onBlur)="onBlurDiv($event)" onPaste="return false"
+                        (completeMethod)="divSearch($event)" [disabled]="fieldStatus['mainDiv'].disable">
+                    </p-autoComplete>
+                    <p-autoComplete #plsselectelm [(ngModel)]="fromPls" [maxlength]="3" minLength="2" placeholder="PLS" [inputStyle]="{width:'65px'}"
+                        [inputStyleClass]="fieldStatus['mainPls'].cssClass" [suggestions]="plsSuggestions" (keyup)='onSearchPlsKeyUp($event)'
+                        (onBlur)="onBlurPls($event)" onPaste="return false" (completeMethod)="plsSearch($event)" [disabled]="fieldStatus['mainPls'].disable">
+                    </p-autoComplete>
+                </div>
+            </td>
+            <td style="width: 30%; text-align:left;">
+                <div style="text-align:left;">
+                    <button #focusSearch pButton type="text" icon="fa fa-search" iconPos="right" (click)="divPlsDatatable.reset();"
+                        title="Search Div-Pls"></button>
+                    <button pButton type="text" title="New Div Pls" icon="fa fa-plus" iconPos="right" (click)="onNewDivPls()"></button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</p-panel>
+
+<p-dataTable #divPlsDatatable [style]="{'width':'95%', 'margin':'auto'}" [responsive]="true" [value]="DivPlsData" [paginator]="true"
+    [rows]="noOfRecordsPerPage" [totalRecords]="totalRecords" selectionMode="single" [(selection)]="selectedRow" dataKey="userName"
+    (onRowSelect)="onRowSelect($event)" [lazy]="true" (onLazyLoad)="loadDivPlsLazy($event)">
+    <hr style="border: 0; height: 2px; background:#2191c0;" />
+    <p-column field="div" header="DIV" [style]="{'width': '10%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="pls" header="PLS" [style]="{'width': '10%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+    <p-column field="minPriceExemptFlag" header="Min. Price Exemption Flag" [style]="{'width': '15%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="createTime" header="Created On" [style]="{'width': '20%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="createId" header="Created By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+    <p-column field="updateTime" header="Updated On" [style]="{'width': '20%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="updateId" header="Updated By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+</p-dataTable>
+
+<p-dialog header="Add New Div Pls" [(visible)]="isNewDivPls" *ngIf="isNewDivPls" [width]="500" modal="modal" [height]="300"
+    [style]="{'text-align':'left'}">
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="false"></p-messages>
+    </div>
+    <br/>
+
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="div">Div</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['DivPlsScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6"><input pInputText #DivPlsCdElm id="div" [(ngModel)]="divPls.div" maxlength="2" [style]="{'width':'30%'}" [class.loading]="fieldStatus['addDivPls'].loading"
+                    [class.red-border]="!fieldStatus['addDivPls'].valid" (keyup)="onDivKeyUp()" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="pls">Pls</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['DivPlsScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6"><input pInputText id="pls" [(ngModel)]="divPls.pls" maxlength="3" [style]="{'width':'30%'}" [class.loading]="fieldStatus['addDivPls'].loading"
+                    [class.red-border]="!fieldStatus['addDivPls'].valid" (keyup)="onPlsKeyUp()" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="part">Min. Price Exemption Flag</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['DivPlsScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6">
+                <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isMinPriceExempt"></p-inputSwitch>
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="clearData()" label="Clear"></button>
+            <button type="button" pButton icon="fa-check" [disabled]="!fieldStatus['DivPlsScr']['saveEnabled']" (click)="newDivPlsSave()"
+                label="Save"></button>
+        </div>
+    </p-footer>
+</p-dialog>
+
+<p-dialog header="Edit Div Pls" [(visible)]="isEditDivPls" *ngIf="isEditDivPls" [width]="500" modal="modal" [height]="300"
+    [style]="{'text-align':'left'}">
+
+    <div id="msg" style="text-align:left;">
+        <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+    <br/>
+
+    <div class="ui-grid ui-grid-responsive ui-fluid">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="div">Div</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['DivPlsScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6"><input pInputText #DivPlsCdElm id="div" [(ngModel)]="divPls.div" maxlength="2" [style]="{'width':'30%'}" [class.loading]="fieldStatus['addDivPls'].loading"
+                    [class.red-border]="!fieldStatus['addDivPls'].valid" (keyup)="onDivKeyUp()" [disabled]="true" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="pls">Pls</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['DivPlsScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6"><input pInputText id="pls" [(ngModel)]="divPls.pls" maxlength="3" [style]="{'width':'30%'}" [class.loading]="fieldStatus['addDivPls'].loading"
+                    [class.red-border]="!fieldStatus['addDivPls'].valid" (keyup)="onPlsKeyUp()" [disabled]="true" /></div>
+        </div>
+        <br>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><label for="part">Min. Price Exemption Flag</label>
+                <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['DivPlsScr']['mandatory']"></i></span>
+            </div>
+            <div class="ui-grid-col-6">
+                <p-inputSwitch onLabel="Yes" offLabel="No" [(ngModel)]="isMinPriceExempt"></p-inputSwitch>
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-helper-clearfix">
+            <button type="button" pButton icon="fa-close" (click)="hideEditDialog()" label="Cancel"></button>
+            <button type="button" pButton icon="fa-check" (click)="newDivPlsSave()" label="Save"></button>
+        </div>
+    </p-footer>
+</p-dialog>

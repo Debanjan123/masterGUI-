@@ -1,0 +1,74 @@
+<wait-spinner [visible]="spinnerVisible"></wait-spinner>
+<div class="ui-grid ui-grid-responsive ui-grid-pad">
+    <div class="ui-grid-row">
+        <div class="ui-grid-col-12" style="padding: 1px;">
+            <p-toolbar>
+                <div class="ui-toolbar-group-left" style="float: none !important;">
+                    <table style="width: 100%; ">
+                        <tr>
+                            <td style="width: 30%; text-align:right;">
+                               &nbsp;&nbsp;
+                            </td>
+
+                            <td style="width: 40%; text-align:center;">
+                                <span style="font-size: 20px; color:white;">
+                                    {{ appTitle }}
+                                </span>
+                            </td>
+
+                            <td style="width: 30%;">
+                                <table style="width: 100%; ">
+                                    <tr>
+                                        <td style="width: 15%; text-align:center; vertical-align:bottom;">
+                                          
+                                        </td>
+                                        <td style="width: 65%; text-align:right;">
+                                            <header-user></header-user>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </p-toolbar>
+        </div>
+    </div>
+    <div class="ui-grid-row">
+        <div class="ui-grid-col-12" style="text-align: center; padding: 1px;">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+     <div class="ui-grid-row">
+        <div class="ui-grid-col-12" style="position: fixed; bottom: 0; width: 100%;">
+            <p-toolbar>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <span style="font-size: 8px; color:white;">{{ footerText }}</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <span *ngIf="showBuildDetails">
+                                <span style="font-size: 8px; color:white;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                                <span style="font-size: 8px; color:white;">Environment: {{ environment }}</span>
+                                <span style="font-size: 8px; color:white;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                                <span style="font-size: 8px; color:white;">Build Version: {{ buildversion }}</span>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </p-toolbar>
+        </div>
+    </div>
+
+</div>
+
+<p-dialog header="Session" [(visible)]="isSessionDialogVisible" *ngIf="isSessionDialogVisible" [width]="350" modal="modal"
+    [height]="auto" [style]="{'text-align':'left'}">
+    <div style="text-align:center; margin:auto;">
+        <br/>
+        <span *ngIf="isCountDownMgsVisible">Your session will expire in <span style="color:red; font-weight:bold;">{{ countDown }}</span>        second(s).</span>
+        <span *ngIf="isSessionExpiredMsgVisible" style="color:red; font-weight:bold;">Oops!! Your session has expired.</span>
+    </div>
+    <br/>
+</p-dialog>

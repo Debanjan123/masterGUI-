@@ -1,0 +1,155 @@
+<br/>
+<br/> 
+<p-panel [style]="{'width':'95%', 'margin':'auto'}">
+    <p-header>
+        <div style="margin:auto; text-align:left;">
+            <div class="ui-grid-col-8">
+                    <span>{{ componentTitle }}</span>
+            </div>
+        </div>
+    </p-header>
+
+    <div id="msg" style="text-align:left;">
+          <p-messages [(value)]="msgs"  autoUpdate="true" [closable]="true"></p-messages>
+    </div>
+     <div id="msg" style="text-align:left;">
+         <p-growl [(value)]="successMsgs"></p-growl>
+      </div>
+
+    <p-tabView>
+        <p-tabPanel header="By Range" [selected]="true">
+            <table style="width: 100%;">
+            <tr>
+                <td style="width: 50%; text-align:left;">
+                    <div  style="border-right:1px solid grey;" >
+                        <span style="font-weight:bold">From Item #:&nbsp;</span>
+                        <p-autoComplete [(ngModel)]="fromDiv" [maxlength]="2" placeholder="DIV" [scrollHeight]="100" 
+                            [inputStyle]="{width:'55px'}" #divfromselectelm (keyup)='onFromDivKeyUp($event)' (onBlur)="onBlurFromDiv($event)" [inputStyleClass]="fieldStatus['fromDiv'].cssClass" onPaste="return false">
+                        </p-autoComplete>
+                         <p-autoComplete [(ngModel)]="fromPls"  [maxlength]="3" placeholder="PLS" [inputStyle]="{width:'65px'}" #plsfromselectelm
+                            [scrollHeight]="100" (keyup)='onFromPlsKeyUp($event)' (onBlur)="onBlurFromPls($event)" [inputStyleClass]="fieldStatus['fromPls'].cssClass" onPaste="return false">
+                         </p-autoComplete>
+                         <input type="text" #focusFromPart pInputText onfocus="this.select();" placeholder="PART" #focusFromPart [(ngModel)]="fromPart"
+                            [class.red-border]="!fieldStatus['fromPartNo'].valid" maxlength="24"  style="width: 43%;" (keyup)="addFromPart($event)" />
+                    </div>
+                </td>
+                <td style="width: 50%; text-align:left;">
+                    <div>
+                        <span style="font-weight:bold">To Item #:&nbsp;</span>
+                        <p-autoComplete [(ngModel)]="toDiv"   [maxlength]="2" placeholder="DIV" #divfromselectelm [scrollHeight]="100" [inputStyle]="{width:'55px'}"
+                          [inputStyleClass]="fieldStatus['toDiv'].cssClass" (onBlur)="onBlurToDiv($event)" (keyup)='onToDivKeyUp($event)' onPaste="return false">
+                        </p-autoComplete>
+                        <p-autoComplete [(ngModel)]="toPls"   [maxlength]="3" placeholder="PLS" #plstoselectelm [inputStyleClass]="fieldStatus['toPls'].cssClass"
+                             [scrollHeight]="100" [inputStyle]="{width:'65px'}" (onBlur)="onBlurToPls($event)" (keyup)='onToPlsKeyUp($event)' onPaste="return false">
+                        </p-autoComplete>
+                        <input type="text" pInputText onfocus="this.select();" placeholder="PART" [class.red-border]="!fieldStatus['toPartNo'].valid"
+                            #focusToPart maxlength="24"  style="width: 43%;" (keyup)="addToPart($event)" [(ngModel)]="toPart" />
+                      </div>
+                </td>
+           </tr>
+        </table>
+       <p-footer>
+            <hr style="border: 0; height: 2px; background:#2191c0;"/>
+            <div style="text-align:right;">
+                 <input type="text"  [(ngModel)]="limit" pInputText onfocus="this.select();" placeholder="Limit 200,000" maxlength="6"  style="width: 120px;" [disabled]="isLimitDisabled" (keyup)='onLimitKeyUp($event)' onPaste="return false"/>
+                 <p-calendar [(ngModel)]="jobScheduleDate" showTime="showTime" [minDate]="minDate" hourFormat="24" placeholder="You can schedule your Job Date/Time" readonlyInput="true"></p-calendar>
+                <button pButton type="text" label="Submit" icon="fa fa-floppy-o" iconPos="right" (click)="_onRangeSubmit()" [disabled]="isSubmit"></button>
+            </div>
+         </p-footer>        
+      </p-tabPanel>
+    <p-tabPanel header="By File">
+        <br/>
+        <p-fieldset legend="File Upload" align="left" >
+            <table>
+                <tr>
+                    <td>
+                       <input #selectedFile type="file"  (change)="fileChangeEvent($event)" placeholder="Upload file"/>
+                     </td>
+                </tr>    
+            </table>
+        </p-fieldset>
+               
+        <p-footer>
+            <hr style="border: 0; height: 2px; background:#2191c0;"/>
+            <div style="text-align:right;">
+                 <input type="text"  [(ngModel)]="fileLimit" pInputText placeholder="Limit 200,000" maxlength="6"  style="width: 120px;" (keyup)='onLimitKeyUp($event)' onPaste="return false"/>
+                 <p-calendar [(ngModel)]="fileSheduleDate" showTime="showTime" [minDate]="minDate" hourFormat="24" placeholder="You can schedule your Job Date/Time" readonlyInput="true"></p-calendar>
+                 <button icon="fa fa-upload" iconPos="right" [disabled]="!isFileExist" pButton type="text" label="Upload"  (click)="upload();selectedFile.value = '';"></button>
+            </div>
+         </p-footer>
+    </p-tabPanel>
+  </p-tabView>
+</p-panel>
+
+<br/>
+
+<p-dataTable [style]="{'width':'95%', 'height':'85%', 'margin':'auto'}"  tableStyleClass="prime-table-one" [value]="reportDataDetails"  [rows]="10" [paginator]="true" [rowStyleClass]="customizeRowStyle" selectionMode="single" [(selection)]="selectedRow"  
+>
+     <hr style="border: 0; height: 2px; background:#2191c0;"/>
+    <p-header>
+         <div class="ui-grid ui-grid-responsive ui-grid-pad">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6">
+                    <span style="float:left">Report Request History</span>
+                </div>
+                <div class="ui-grid-col-6">
+                    <span style="float:right">
+                        <button pButton type="text" label="Refresh" icon="fa fa-refresh" iconPos="right"
+                             (click)="refrashJobScheduleHistory()"></button>
+                     </span>
+                </div>
+             </div>
+        </div>
+    </p-header>
+    <p-column header='Report Id' [style]="{'text-align':'center','width': '10%'}">
+        <template let-col let-item="rowData" pTemplate="body">
+            <span *ngIf="item['costHistoryReportId']">REQ{{("000000"+item['costHistoryReportId']).slice(-6)}}</span>
+        </template>
+    </p-column>
+    <p-column header='Report By' [style]="{'text-align':'center','width': '10%'}" tableStyleClass="prime-table">
+        <template let-col let-item="rowData" pTemplate="body">
+            <span *ngIf="item['reportByTypeCd'] == 'R'">Range</span>
+            <span *ngIf="item['reportByTypeCd'] == 'F'">File</span>
+        </template>
+    </p-column>
+    <p-column header='Criteria' [style]="{'text-align':'center','width': '20%'}">
+         <template let-col let-item="rowData" pTemplate="body">
+            <span *ngIf="item['reportByTypeCd'] == 'R'">{{item['fromPart']}}~{{item['toPart']}}</span>
+            <span *ngIf="item['reportByTypeCd'] == 'F'" (click)="inputClick(item)" title="Click on the File Name to Download the File" class="underline-on-hover">{{item['inputFileName']}}</span>
+         </template>
+    </p-column>
+    <p-column field='reportLimit'  header='Limit'  [style]="{'text-align':'center','width': '10%'}"></p-column>
+    <p-column field='createdTs'  header='Created At'  [style]="{'text-align':'center','width': '17%'}"></p-column>
+    <p-column field='scheduledTs' header='Scheduled At' [sortable]="true" [style]="{'text-align':'center','width': '17%'}" [filter]="isFilter" filterMatchMode="contains" filterPlaceholder="Filter Date"></p-column>
+    <p-column header='Status' [style]="{'text-align':'center', 'width': '9%'}" >
+        <template let-col let-item="rowData" pTemplate="body">
+            <span *ngIf="item['status'] == 'N'">New</span>
+            <span *ngIf="item['status'] == 'C'">Cancelled</span>
+            <span *ngIf="item['status'] == 'F'">Failed</span>
+            <span *ngIf="item['status'] == 'R'">Retried</span>
+            <span *ngIf="item['status'] == 'P'">Processed</span>
+        </template>
+    </p-column>
+    <p-column header='Actions' styleClass="col-button" [style]="{'text-align': 'center', 'width': '17%'}" >
+        <template let-col let-item="rowData" pTemplate="body">
+            <button pButton type="button"   icon="fa fa-long-arrow-down" (click)="downloadOutput(item)" iconPos="right" title="Output File Download" [disabled]="!item['outputReportName']"></button>
+            <button pButton type="button"   icon="fa fa-download" (click)="downloadReport(item)" iconPos="right" title="Error File Download" [disabled]="!item['rejectedReportName']"></button>
+            <button pButton type="button"   icon="fa fa-repeat" (click)="retry(item)" iconPos="right" title="Retry" [disabled]="item['status'] != 'F'"></button>
+            <button pButton type="button"   icon="fa fa-times" (click)="cancel(item)" iconPos="right" [disabled]="item['status'] != 'N'" title="Cancel" ></button>
+        </template>
+    </p-column>
+
+</p-dataTable>
+
+<p-dialog header="Retry"  [responsive]="true" 
+showEffect="fade" [modal]="true" width="600" [(visible)]="onRetry" [height]="380" [style]="{'text-align':'left'}" resizable="true" closable="true" maximizable="true">
+   <p>The original Job Schedule Date is already past. Please schedule on future Date/Time and Click on Resubmit. Otherwise by default job will be scheduled to current Date/Time.</p>
+     <hr style="border: 0; height: 2px; background:#2191c0;"/>
+    <p-footer>
+        <div style="text-align:right;">
+           <p-calendar [(ngModel)]="retrySheduleDate" showTime="showTime" hourFormat="24" placeholder="You can schedule your Job Date/Time" readonlyInput="true"></p-calendar>
+           <button type="button" pButton icon="fa-check" (click)="resubmit()" label="Re-Submit" iconPos="right"></button>
+        </div>
+    </p-footer>
+</p-dialog>
+

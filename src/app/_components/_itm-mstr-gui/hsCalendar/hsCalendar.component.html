@@ -1,0 +1,138 @@
+<br/>
+<br/>
+<div id="msg" style="text-align:left;">
+    <p-growl [(value)]="successMsgs"></p-growl>
+</div>
+<div id="msg" style="text-align:left; width:95%;margin:auto">
+    <p-messages [(value)]="msgs" autoUpdate="true" [closable]="true"></p-messages>
+    <p-messages [(value)]="warnMsgs" autoUpdate="true" [closable]="true"></p-messages>
+</div>
+<p-dataTable #calendarDatatable [style]="{'width':'95%', 'margin':'auto'}" [value]="hsCalendarData" [paginator]="true" [totalRecords]="totalRecords"
+    [rows]="10" selectionMode="single" [(selection)]="selectedRow" [lazy]="true" (onLazyLoad)="loadCalendarLazy($event)" dataKey="userName"
+    (onRowSelect)="onRowSelect($event)">
+    <hr style="border: 0; height: 2px; background:#2191c0;" />
+
+
+    <p-header>
+        <div class="ui-grid ui-grid-responsive ui-grid-pad">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6">
+                    <span style="float:left">Calendar</span>
+                    <br/>
+                    <span style="float:left">
+                        <p-dropdown [options]="selectedHsCalendar" [(ngModel)]="selectCalendar" (onChange)="onYearDropDownChange();calendarDatatable.reset()"></p-dropdown>
+                     </span>
+                </div>
+                <div class="ui-grid-col-6">
+                    <span style="float:right">
+                        <button pButton type="text" label="New Calendar" icon="fa fa-plus" iconPos="right" (click)="onNewHsCalendar()"></button>
+                     </span>
+                </div>
+            </div>
+        </div>
+    </p-header>
+
+    <p-column field="hsCalDate" header="Calendar Date" [style]="{'width': '15%', 'text-align': 'left', 'font-size':'small'}"
+        [sortable]="true"></p-column>
+    <p-column field="calCode" header="Calendar Code" [style]="{'width': '25%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+    <p-column field="createTime" header="Created On" [style]="{'width': '25%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="createId" header="Created By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+    <p-column field="updateTime" header="Updated On" [style]="{'width': '25%', 'text-align': 'left', 'font-size':'small'}"></p-column>
+    <p-column field="updateId" header="Updated By" [style]="{'width': '15%', 'text-align': 'left','font-size':'small'}" class="overflow ellipsis"></p-column>
+
+    <p-column [style]="{'font-size':'10px', 'text-align': 'center', 'width': '3%'}">
+        <template pTemplate="header">
+            <i class="fa fa-recycle"></i>
+        </template>
+        <template let-cal="rowData" pTemplate="body">
+            <button type="button" title="Remove Item from Cart" pButton icon="fa fa-trash" (click)="selectCalToDelete(cal)"></button>
+        </template>
+    </p-column>
+
+</p-dataTable>
+
+
+<p-dialog header="Add New Calendar" [(visible)]="isNewHsCalendar" *ngIf="isNewHsCalendar" [width]="500" modal="modal" [height]="300"
+    [style]="{'text-align':'left'}" focusOnShow="true">
+    <div class="ui-dialog-content" style="padding-bottom:300px;">
+        <div id="msg" style="text-align:left;">
+            <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="false"></p-messages>
+        </div>
+        <br/>
+
+        <div class="ui-grid ui-grid-responsive ui-fluid">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="div">Calendar date</label>
+                    <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hsCalendar']['mandatory']"></i></span>
+                </div>
+                <div class="ui-grid-col-8">
+                    <p-calendar #addDate [(ngModel)]="addNewCalDate" dateFormat="yy-mm-dd" showIcon="true" readonlyInput="true" [style]="{'width':'250px'}"
+                        [monthNavigator]="true" [yearNavigator]="true" [minDate]="todayDate" [yearRange]="yearRange"></p-calendar>
+
+                </div>
+            </div>
+            <br>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="pls">Calendar Code</label>
+                    <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hsCalendar']['mandatory']"></i></span>
+                </div>
+                <div class="ui-grid-col-8">
+                    <p-dropdown [options]="selectCalCd" [(ngModel)]="selectedCd" [style]="{'width':'250px'}" autoDisplayFirst="false"></p-dropdown>
+                </div>
+            </div>
+            <br>
+
+            <div class="ui-dialog-buttonpane ui-helper-clearfix">
+                <button type="button" pButton icon="fa-close" (click)="clearData()" label="Cancel"></button>
+                <button type="button" pButton icon="fa-check" [disabled]="!fieldStatus['hsCalendar']['saveEnabled']" (click)="onClickSave()"
+                    label="Save"></button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog header="Edit Calendar" [(visible)]="isEditHsCalendar" *ngIf="isEditHsCalendar" [width]="500" modal="modal" [height]="300"
+    [style]="{'text-align':'left'}">
+
+    <div class="ui-dialog-content" style="padding-bottom:300px;">
+        <div id="msg" style="text-align:left;">
+            <p-messages [(value)]="addmsgs" autoUpdate="true" [closable]="false"></p-messages>
+        </div>
+        <br/>
+
+        <div class="ui-grid ui-grid-responsive ui-fluid">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="div">Calendar date</label>
+                    <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hsCalendar']['mandatory']"></i></span>
+                </div>
+                <div class="ui-grid-col-8">
+                    <p-calendar [(ngModel)]="editCalDate" dateFormat="yy-mm-dd" showIcon="true" [monthNavigator]="true" [yearNavigator]="true"
+                        [yearRange]="yearRange" readonlyInput="true" [minDate]="todayDate" [style]="{'width':'220px'}"></p-calendar>
+                </div>
+            </div>
+            <br>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="pls">Calendar Code</label>
+                    <span style="font-size:.50em; color:red; text-align:left;"><i class="fa fa-asterisk" *ngIf="fieldStatus['hsCalendar']['mandatory']"></i></span>
+                </div>
+                <div class="ui-grid-col-8">
+                    <p-dropdown [options]="selectCalCd" [(ngModel)]="selectedCd" [style]="{'width':'220px'}"></p-dropdown>
+                </div>
+            </div>
+            <br>
+
+            <div class="ui-dialog-buttonpane ui-helper-clearfix">
+                <button type="button" pButton icon="fa-close" (click)="clearData()" label="Cancel"></button>
+                <button type="button" pButton icon="fa-check" [disabled]="!fieldStatus['hsCalendar']['saveEnabled']" (click)="onClickSave()"
+                    label="Save"></button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog header="Caution" [(visible)]="isDialog" *ngIf="isDialog" modal="modal" [style]="{'text-align':'left'}">
+    You cannot edit records in Past date
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+        <button type="button" pButton icon="fa-close" (click)="clickOk()" label="OK"></button>
+    </div>
+</p-dialog>
